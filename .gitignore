@@ -1,0 +1,43 @@
+.env.local
+.env.*.local
+node_modules
+tsconfig.tsbuildinfo
+supabase/.temp/project-ref
+.DS_Store
+
+# next.js
+.next
+/out
+
+# next-sitemap
+public/robots.txt
+public/sitemap.xml
+public/sitemap-*.xml
+
+# debug
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+*.tsbuildinfo
+
+# playwright
+test-results/
+playwright/.auth/
+
+# Legacy ascii/one CLI ignore file
+.oneignore
+
+# turbo
+.turbo
+
+# Weston scraper (sesión + datos de distribuidor: sensibles)
+apps/web/scripts/weston-session.json
+apps/web/scripts/weston-productos.json
+
+# Estudios de rentabilidad (datos de costos: sensibles)
+apps/web/rentabilidad.csv
+apps/web/rentabilidad-subfamilias.csv
+apps/web/deactivados.csv
+apps/web/deactivados-envio.csv
