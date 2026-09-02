@@ -1,5 +1,8 @@
-import { getCategories } from '@/data/anon/catalog';
-import { getCategoryStats } from '@/data/anon/catalog-counts';
+import {
+  countCategorySubtree,
+  getCategories,
+  getCategoryStats,
+} from '@/data/anon/catalog';
 import {
   familiaDisplayName,
   familiaSlug,

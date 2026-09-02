@@ -1,5 +1,5 @@
-'use server';
-import { createSupabaseClient } from '@/supabase-clients/server';
+import { cacheTag } from 'next/cache';
+import { createAdminClient } from '@/supabase-clients/admin';
 import { familiaRawNamesForSlug } from './familias';
 import { Table } from '@/types';
 
@@ -47,8 +47,16 @@ const hiddenCategoryIds = (categories: Table<'categories'>[]): Set<string> => {
   return hidden;
 };
 
+/**
+ * Datos del catálogo cacheados ('use cache', 15 min).
+ * Se invalidan con updateTag('catalog') cuando el admin muta productos/
+ * categorías (data/user/admin.ts). Client admin (sin cookies) = cacheable.
+ */
+
 export const getCategories = async (): Promise<Table<'categories'>[]> => {
-  const supabase = await createSupabaseClient();
+  'use cache';
+  cacheTag('catalog');
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from('categories')
     .select('*')
@@ -60,13 +68,63 @@ export const getCategories = async (): Promise<Table<'categories'>[]> => {
 };
 
 export const getUnits = async (): Promise<Table<'units'>[]> => {
-  const supabase = await createSupabaseClient();
+  'use cache';
+  cacheTag('catalog');
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from('units')
     .select('*')
     .order('nombre', { ascending: true });
   if (error) throw error;
   return data;
+};
+
+export type CategoryStats = {
+  /** Productos activos por categoría */
+  counts: Record<string, number>;
+  /** categoria_id → familia_weston (raw) del primer producto */
+  familiaByCategory: Record<string, string>;
+};
+
+export const getCategoryStats = async (): Promise<CategoryStats> => {
+  'use cache';
+  cacheTag('catalog');
+  const supabase = createAdminClient();
+  const { data, error } = await supabase.rpc('get_category_stats');
+  if (error) throw error;
+  const counts: Record<string, number> = {};
+  const familiaByCategory: Record<string, string> = {};
+  for (const row of (data ?? []) as Array<{
+    category_id: string;
+    count: number;
+    familia_weston: string | null;
+  }>) {
+    counts[row.category_id] = Number(row.count);
+    if (row.familia_weston && !familiaByCategory[row.category_id]) {
+      familiaByCategory[row.category_id] = row.familia_weston;
+    }
+  }
+  return { counts, familiaByCategory };
+};
+
+/** Conteo de una categoría incluyendo sus descendientes */
+export const countCategorySubtree = (
+  categories: Table<'categories'>[],
+  counts: Record<string, number>,
+  rootId: string
+): number => {
+  let total = 0;
+  const stack = [rootId];
+  while (stack.length > 0) {
+    const current = stack.pop()!;
+    total += counts[current] ?? 0;
+    for (const category of categories) {
+      if (category.parent_id === current) {
+        stack.push(category.id);
+      }
+    }
+  }
+  return total;
 };
 
 type ProductFilters = {
@@ -159,7 +217,9 @@ function applyFilters(
 export const getProducts = async (
   opts: ProductFilters & { page?: number; pageSize?: number }
 ): Promise<ProductPage> => {
-  const supabase = await createSupabaseClient();
+  'use cache';
+  cacheTag('catalog');
+  const supabase = createAdminClient();
   const page = opts.page ?? 1;
   const pageSize = opts.pageSize ?? 24;
   const filters = await resolveFilters(supabase, opts);
@@ -187,7 +247,9 @@ export const getProducts = async (
 export const getProductBySlug = async (
   slug: string
 ): Promise<CatalogProduct | null> => {
-  const supabase = await createSupabaseClient();
+  'use cache';
+  cacheTag('catalog');
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from('products')
     .select('*, category:categories(*), unit:units(*), images:product_images(*)')

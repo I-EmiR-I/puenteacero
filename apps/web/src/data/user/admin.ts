@@ -1,7 +1,7 @@
 'use server';
 import { authActionClient } from '@/lib/safe-action';
 import { createSupabaseClient } from '@/supabase-clients/server';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, updateTag } from 'next/cache';
 import { z } from 'zod';
 
 export async function isAdmin(): Promise<boolean> {
@@ -64,6 +64,7 @@ export const createProductAction = authActionClient
     if (error) throw new Error(error.message);
     revalidatePath('/admin/productos');
     revalidatePath('/catalogo');
+    updateTag('catalog');
   });
 
 export const updateProductAction = authActionClient
@@ -89,6 +90,7 @@ export const updateProductAction = authActionClient
     if (error) throw new Error(error.message);
     revalidatePath('/admin/productos');
     revalidatePath('/catalogo');
+    updateTag('catalog');
   });
 
 const deleteSchema = z.object({ id: z.string().uuid() });
@@ -104,10 +106,11 @@ export const deleteProductAction = authActionClient
     if (error) throw new Error(error.message);
     revalidatePath('/admin/productos');
     revalidatePath('/catalogo');
+    updateTag('catalog');
   });
 
 // =============================================================================
-// Categorías
+// CategorÃ­as
 // =============================================================================
 
 const categorySchema = z.object({
@@ -131,6 +134,7 @@ export const createCategoryAction = authActionClient
     if (error) throw new Error(error.message);
     revalidatePath('/admin/categorias');
     revalidatePath('/catalogo');
+    updateTag('catalog');
   });
 
 export const updateCategoryAction = authActionClient
@@ -150,6 +154,7 @@ export const updateCategoryAction = authActionClient
     if (error) throw new Error(error.message);
     revalidatePath('/admin/categorias');
     revalidatePath('/catalogo');
+    updateTag('catalog');
   });
 
 export const deleteCategoryAction = authActionClient
@@ -163,6 +168,7 @@ export const deleteCategoryAction = authActionClient
     if (error) throw new Error(error.message);
     revalidatePath('/admin/categorias');
     revalidatePath('/catalogo');
+    updateTag('catalog');
   });
 
 // =============================================================================
@@ -228,7 +234,7 @@ export const deleteCouponAction = authActionClient
   });
 
 // =============================================================================
-// Órdenes
+// Ã“rdenes
 // =============================================================================
 
 const orderStatusSchema = z.object({
