@@ -531,6 +531,14 @@ export type Database = {
         Returns: Json
       }
       es_admin: { Args: never; Returns: boolean }
+      get_category_stats: {
+        Args: never
+        Returns: {
+          category_id: string
+          count: number
+          familia_weston: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
