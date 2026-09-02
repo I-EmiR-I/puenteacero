@@ -41,3 +41,4 @@ apps/web/rentabilidad.csv
 apps/web/rentabilidad-subfamilias.csv
 apps/web/deactivados.csv
 apps/web/deactivados-envio.csv
+.vercel

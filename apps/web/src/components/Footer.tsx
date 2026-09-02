@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { BrandLogo } from '@/components/brand/logo';
+import { BrandWordmark } from '@/components/brand/logo';
 import {
   Facebook,
   Instagram,
@@ -16,12 +16,7 @@ const Footer = () => {
       <div className="container mx-auto max-w-screen-2xl px-4 py-12 md:py-16">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-4">
-            <div className="flex items-center gap-2.5">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-foreground text-primary">
-                <BrandLogo className="h-5 w-5" />
-              </span>
-              <span className="text-lg font-bold tracking-tight">PuenteAcero</span>
-            </div>
+            <BrandWordmark />
             <p className="text-sm text-primary-foreground/80">
               Ferretería en línea: herrajes, herramientas, máquinas y
               materiales para obra, taller y hogar. Envío a todo México.
