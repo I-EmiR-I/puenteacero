@@ -49,6 +49,12 @@ const config: NextConfig = {
         port: '54321',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'productos.westontools.com.mx',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 };
