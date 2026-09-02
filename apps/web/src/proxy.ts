@@ -4,10 +4,11 @@ import { updateSession } from './supabase-clients/middleware';
 
 const apiRoutes = ['/api{/*path}'];
 
-// Catálogo: público e idéntico para todos (el carrito es client-side) →
-// se cachea en el CDN de Vercel 3 min por URL. El admin invalida el
-// 'use cache' de datos; el CDN refresca solo (stale-while-revalidate).
-const CDN_CACHEABLE = (pathname: string) => pathname === '/catalogo';
+// Portada y catálogo: públicos e idénticos para todos (el carrito es
+// client-side) → se cachean en el CDN de Vercel 3 min por URL. El admin
+// invalida el 'use cache' de datos; el CDN refresca solo (swr).
+const CDN_CACHEABLE = (pathname: string) =>
+  pathname === '/' || pathname === '/catalogo';
 
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
