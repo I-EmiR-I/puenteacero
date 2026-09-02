@@ -27,7 +27,7 @@ export async function CuratedRow({
       if (!seen.has(product.id)) seen.set(product.id, product);
     }
   }
-  const products = [...seen.values()].slice(0, 12);
+  const products = [...seen.values()].slice(0, 8);
   if (products.length === 0) return null;
 
   return (
