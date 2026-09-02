@@ -231,7 +231,7 @@ export const getProducts = async (
     supabase
       .from('products')
       .select(
-        'id, sku, slug, nombre, descripcion, precio, stock, envio_nacional, activo, category:categories(*), unit:units(*), images:product_images(url, alt, orden)',
+        'id, sku, slug, nombre, precio, stock, envio_nacional, activo, category:categories(nombre, slug, parent_id), unit:units(simbolo, slug, admite_decimales), images:product_images(url, alt)',
         { count: 'exact' }
       ),
     opts,
