@@ -164,18 +164,16 @@ export const getProducts = async (
   const pageSize = opts.pageSize ?? 24;
   const filters = await resolveFilters(supabase, opts);
 
-  const { count } = await applyFilters(
-    supabase.from('products').select('id', { count: 'exact', head: true }),
-    opts,
-    filters
-  );
-
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
-  const { data, error } = await applyFilters(
+  // Una sola query: datos + conteo exacto (sin request de count aparte)
+  const { data, error, count } = await applyFilters(
     supabase
       .from('products')
-      .select('*, category:categories(*), unit:units(*), images:product_images(*)'),
+      .select(
+        'id, sku, slug, nombre, descripcion, precio, stock, envio_nacional, activo, category:categories(*), unit:units(*), images:product_images(url, alt, orden)',
+        { count: 'exact' }
+      ),
     opts,
     filters
   )
