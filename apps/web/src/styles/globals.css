@@ -254,6 +254,15 @@
   background-clip: padding-box;
 }
 
+/* Carrusel de chips sin scrollbar visible */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 @import './utils.css';
 
 @custom-variant dark (&:is(.dark *));

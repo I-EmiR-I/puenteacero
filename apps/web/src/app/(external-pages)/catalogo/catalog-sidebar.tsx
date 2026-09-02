@@ -1,38 +1,14 @@
-import {
-  countCategorySubtree,
-  getCategories,
-  getCategoryStats,
-} from '@/data/anon/catalog';
-import {
-  familiaDisplayName,
-  familiaSlug,
-} from '@/data/anon/familias';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { connection } from 'next/server';
 import { ChevronRight, Search } from 'lucide-react';
 import Link from 'next/link';
-import type { CatalogFilters } from './page';
-
-function catalogHref(
-  current: CatalogFilters,
-  overrides: Partial<CatalogFilters>
-): string {
-  const merged: Record<string, string> = {};
-  const next = { ...current, ...overrides };
-  for (const [key, value] of Object.entries(next)) {
-    if (value && key !== 'pagina') merged[key] = value;
-  }
-  const qs = new URLSearchParams(merged).toString();
-  return qs ? `/catalogo?${qs}` : '/catalogo';
-}
-
-type Familia = {
-  display: string;
-  slug: string;
-  total: number;
-  subcats: Array<{ id: string; nombre: string; slug: string; count: number }>;
-};
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  activeFamilia,
+  catalogHref,
+  getCatalogNavData,
+  type CatalogFilters,
+} from './catalog-nav';
 
 export async function CatalogSidebar({
   searchParams,
@@ -41,42 +17,10 @@ export async function CatalogSidebar({
 }) {
   await connection();
   const current = await searchParams;
-  const [categories, stats] = await Promise.all([
-    getCategories(),
-    getCategoryStats(),
-  ]);
+  const lista = await getCatalogNavData();
+  const active = activeFamilia(lista, current);
 
-  // Agrupar subcategorías por familia (Weston), ocultando vacías
-  const familias = new Map<string, Familia>();
-  for (const cat of categories) {
-    if (!cat.parent_id) continue;
-    const count = stats.counts[cat.id] ?? 0;
-    if (count === 0) continue;
-    const raw = stats.familiaByCategory[cat.id] ?? '';
-    const key = raw || '__otros__';
-    if (!familias.has(key)) {
-      familias.set(key, {
-        display: familiaDisplayName(raw) || 'Otros',
-        slug: familiaSlug(raw) || 'otros',
-        total: 0,
-        subcats: [],
-      });
-    }
-    const familia = familias.get(key)!;
-    familia.total += count;
-    familia.subcats.push({ id: cat.id, nombre: cat.nombre, slug: cat.slug, count });
-  }
-  const lista = [...familias.values()].sort((a, b) => b.total - a.total);
-
-  const totalProducts = Object.values(stats.counts).reduce((a, b) => a + b, 0);
-
-  // Familia activa (por ?familia o porque el producto está en una subcat suya)
-  const activeFamilia =
-    lista.find((f) => f.slug === current.familia) ??
-    lista.find((f) =>
-      f.subcats.some((c) => c.slug === current.categoria)
-    );
-
+  const totalProducts = lista.reduce((a, f) => a + f.total, 0);
   const countLabel = (n: number) => n.toLocaleString('es-MX');
 
   return (
@@ -124,7 +68,7 @@ export async function CatalogSidebar({
             </Link>
           </li>
           {lista.map((familia) => {
-            const active = activeFamilia?.slug === familia.slug;
+            const isActive = active?.slug === familia.slug;
             return (
               <li key={familia.slug}>
                 <Link
@@ -133,14 +77,14 @@ export async function CatalogSidebar({
                     familia: familia.slug,
                   })}
                   className={
-                    active
+                    isActive
                       ? 'flex items-center justify-between rounded-md bg-accent px-2.5 py-1.5 font-medium text-accent-foreground'
                       : 'flex items-center justify-between rounded-md px-2.5 py-1.5 text-muted-foreground transition-colors hover:bg-accent/60 hover:text-foreground'
                   }
                 >
                   <span className="flex items-center gap-1">
                     {familia.display}
-                    {active && familia.subcats.length > 0 ? (
+                    {isActive && familia.subcats.length > 0 ? (
                       <ChevronRight className="h-3.5 w-3.5" />
                     ) : null}
                   </span>
@@ -148,7 +92,7 @@ export async function CatalogSidebar({
                     {countLabel(familia.total)}
                   </span>
                 </Link>
-                {active && familia.subcats.length > 0 ? (
+                {isActive && familia.subcats.length > 0 ? (
                   <ul className="ml-3 mt-0.5 space-y-0.5 border-l pl-2">
                     {familia.subcats.map((subcat) => (
                       <li key={subcat.id}>

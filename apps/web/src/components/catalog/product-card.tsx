@@ -18,7 +18,7 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
               alt={product.images?.[0]?.alt ?? product.nombre}
               fill
               className="object-cover transition-transform duration-300 group-hover:scale-105"
-              sizes="(max-width: 768px) 100vw, 25vw"
+              sizes="(max-width: 768px) 50vw, 25vw"
             />
           ) : (
             <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
@@ -26,32 +26,32 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
             </div>
           )}
           {product.envio_nacional ? (
-            <span className="absolute left-2 top-2 rounded-md bg-background/85 px-2 py-0.5 text-[11px] font-medium backdrop-blur">
+            <span className="absolute left-1.5 top-1.5 rounded-md bg-background/85 px-1.5 py-0.5 text-[10px] font-medium backdrop-blur sm:left-2 sm:top-2 sm:px-2 sm:text-[11px]">
               Envío nacional
             </span>
           ) : null}
         </div>
-        <CardContent className="flex flex-1 flex-col gap-1 p-4">
-          <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+        <CardContent className="flex flex-1 flex-col gap-1 p-2.5 sm:p-4">
+          <p className="hidden font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground sm:block">
             {product.category?.nombre ?? '—'}
           </p>
-          <h3 className="line-clamp-2 text-sm font-semibold leading-snug">
+          <h3 className="line-clamp-2 text-[13px] font-semibold leading-snug sm:text-sm">
             {product.nombre}
           </h3>
-          <div className="mt-auto flex items-end justify-between gap-2 pt-3">
-            <div>
-              <p className="font-mono text-[10px] uppercase tracking-wide text-muted-foreground">
+          <div className="mt-auto flex items-end justify-between gap-2 pt-2 sm:pt-3">
+            <div className="min-w-0">
+              <p className="hidden font-mono text-[10px] uppercase tracking-wide text-muted-foreground sm:block">
                 Precio
               </p>
-              <p className="text-lg font-bold text-primary">
+              <p className="truncate text-sm font-bold text-primary sm:text-lg">
                 {formatPriceWithUnit(product.precio, product.unit.simbolo)}
               </p>
             </div>
             <span
               className={
                 sinStock
-                  ? 'inline-flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-500'
-                  : 'inline-flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-500'
+                  ? 'inline-flex shrink-0 items-center gap-1 text-[10px] text-amber-600 sm:text-xs dark:text-amber-500'
+                  : 'inline-flex shrink-0 items-center gap-1 text-[10px] text-emerald-600 sm:text-xs dark:text-emerald-500'
               }
             >
               <span
@@ -61,7 +61,9 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
                     : 'h-1.5 w-1.5 rounded-full bg-emerald-500'
                 }
               />
-              {sinStock ? 'Por confirmar' : 'Disponible'}
+              <span className="hidden sm:inline">
+                {sinStock ? 'Por confirmar' : 'Disponible'}
+              </span>
             </span>
           </div>
         </CardContent>

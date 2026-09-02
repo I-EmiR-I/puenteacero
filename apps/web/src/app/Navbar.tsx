@@ -17,8 +17,8 @@ export default function Navbar() {
         </p>
       </div>
       <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto flex h-16 max-w-screen-2xl items-center gap-4 px-4">
-          <div className="flex flex-1 items-center gap-6">
+        <div className="container mx-auto flex h-16 max-w-screen-2xl items-center gap-3 px-4">
+          <div className="flex min-w-0 flex-1 items-center gap-6">
             <BrandWordmark />
             <Suspense fallback={<NavLinksFallback />}>
               <NavLinks />
@@ -50,6 +50,18 @@ export default function Navbar() {
               <Link href="/sign-up">Registrarse</Link>
             </Button>
           </div>
+        </div>
+        {/* Buscador móvil estilo marketplace */}
+        <div className="container mx-auto max-w-screen-2xl px-4 pb-3 md:hidden">
+          <form action="/catalogo" method="get" role="search" className="relative">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <input
+              type="search"
+              name="q"
+              placeholder="Buscar producto, marca, SKU…"
+              className="h-10 w-full rounded-lg border bg-muted/50 pl-9 pr-3 text-sm transition-colors placeholder:text-muted-foreground focus:border-ring focus:bg-background focus:ring-[3px] focus:ring-ring/50"
+            />
+          </form>
         </div>
       </div>
     </header>
